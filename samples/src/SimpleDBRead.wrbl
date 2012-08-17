@@ -1,0 +1,48 @@
+@[/*<?php*/]@
+@{extends AbstractDBRead}@
+@[
+]@
+    /**
+     * Read model data from the database.
+     * \@param $db is the database handle
+     */
+    @($this->getAccess())@ function @($this->getName())@($db, $field) {
+@[
+    $dbstuff = $this->getDBStuff();
+    $map = $dbstuff['map'];
+    $bean = '';
+    $query = "SELECT ";
+    $delim = '';
+    foreach($map as $name => $dbname) {
+	$query .= $delim;
+	$query .= $dbname;
+
+	$bean .= $delim;
+	$bean .= '$this->'.$name;
+
+	$delim = ',';
+    }
+    $attr = $this->findAttribute($this->getFieldName());
+
+    $query .= " FROM ".$dbstuff['table'];
+    $query .= " WHERE ".$attr['dbname'].'=';
+    switch($attr['type']) {
+	case 'String':
+	    $query .= "'\$field'";
+	    break;
+	default:
+	    $query .= "\$field";
+	    break;
+    }
+]@
+        $query = "@($query)@";
+        $rs = $db->sql_query($query);
+        $test = $db->sql_error();
+	if($test['code'] != 0) {
+	    throw new Exception($test['message'], $test['code']);
+	}
+	list(@($bean)@) =
+	    $db->sql_fetchrow($rs);
+	$db->sql_freeresult($rs);
+    }
+@[/*?>*/]@

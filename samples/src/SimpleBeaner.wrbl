@@ -1,0 +1,98 @@
+@[/*<?php*/]@
+@{extends AbstractAttributes}@
+@[
+    if(!$this->justInterface()) {
+	// generate declarations
+	foreach($this->getAttributeList() as $attr) {
+]@
+    private $@($attr['name'])@;  // @($attr['comment'])@
+@[
+	}
+    }
+]@
+
+@[
+    // only continue if we need more than declarations
+    if($this->needBeanAccess()) {
+	foreach($this->getAttributeList() as $attr) {
+]@
+
+    /**
+     * Get the @($attr['name'])@. 
+     * \@return @($attr['name'])@
+     */
+    public function get@($attr['methodSuffix'])@() {
+        return($this->@($attr['name'])@);
+    }
+@[
+        // Skip the setter for readonly access
+	if(!$this->readOnly()) {
+
+	    $const = $this->findConstraint($attr['name'], 'readonly');
+	    if(!$const) {
+]@
+    /**
+     * Set the @($attr['name'])@. 
+     * \@param @($attr['name'])@ is @($attr['comment'])@
+     */
+    public function set@($attr['methodSuffix'])@($@($attr['name'])@) {
+@[
+
+    // apply the constraints for the different datatypes
+    if($this->needConstraints()) {
+	switch($attr['type']) {
+	case 'String':
+	    $constraint_types = array('length', 'oneof');
+	    break;
+	case 'int':
+	    $constraint_types = array('between', 'lt', 'le', 'eq', 'gt', 'ge');
+	    break;
+	default:
+	    $constraint_types = array();
+	    break;
+	}
+	foreach($constraint_types as $constraint_type) {
+	    $const = $this->findConstraint($attr['name'], $constraint_type);
+	    if($const) {
+]@
+        if(!@($this->evalConstraint("\${$attr['name']}", $const))@) {
+	    throw new Exception("'@($this->getConstraintName($const))@' constraint violation");
+	}
+@[
+	    } 
+	}
+    }
+]@
+        $this->@($attr['name'])@ = $@($attr['name'])@;
+    }
+@[
+		} // readony contraint
+	    } // readonly
+	} // for each attr
+    } // just decls
+    else if($this->justInterface()) {
+	// just do the function decls
+	foreach($this->getAttributeList() as $attr) {
+]@
+    /**
+     * Get the @($attr['name'])@. 
+     * \@return @($attr['name'])@
+     */
+    public function get@($attr['methodSuffix'])@();
+
+@[
+        // Skip the setter for readonly access
+	if(!$this->readOnly()) {
+]@
+    /**
+     * Set the @($attr['name'])@. 
+     * \@param @($attr['name'])@ is @($attr['comment'])@
+     */
+    public function set@($attr['methodSuffix'])@($@($attr['name'])@);
+@[
+	    }
+	}
+    }
+
+]@
+@[/*?>*/]@

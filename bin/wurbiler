@@ -1,0 +1,24 @@
+#!/usr/bin/php -q
+<?php
+$wurb_home = getenv('WURB_HOME');
+if($wurb_home == null) {
+    echo "WURB_HOME not set!\n";
+    exit();
+}
+if(!defined(FILE_SEPARATOR)) {
+    if(strpos($_ENV['OS'],"Win") !== false) 
+	define('FILE_SEPARATOR', '\\');
+    else
+	define('FILE_SEPARATOR', '/');
+}
+if(!defined(PATH_SEPARATOR)) {
+    if(strpos($_ENV['OS'],"Win") !== false) 
+	define('PATH_SEPARATOR', ';');
+    else
+	define('PATH_SEPARATOR', ':');
+}
+$wurb_php = $wurb_home.FILE_SEPARATOR.'wurb';
+set_include_path(get_include_path().PATH_SEPARATOR.$wurb_php);
+include("DefaultWurbiler.php");
+main($argv);
+?>

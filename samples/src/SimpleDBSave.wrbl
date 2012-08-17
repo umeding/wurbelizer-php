@@ -1,0 +1,137 @@
+@[/*<?php*/]@
+@{extends AbstractDBRead}@
+@[
+]@
+    /**
+     * Read model data from the database.
+     * \@param $db is the database handle
+     */
+    @($this->getAccess())@ function @($this->getName())@($db) {
+@[
+
+    $dbstuff = $this->getDBStuff();
+    if(!isset($dbstuff['primary']))
+	throw new Exception("SimpleDBSave: primary key definition missing");
+
+    // Create the update query
+    $map = $dbstuff['map'];
+    $bean = '';
+    $update = "\"UPDATE ".$dbstuff['table']." SET \"";
+    $delim = "\n                .\"";
+    $len = count($map);
+    $curEle = 0;
+    foreach($map as $name => $dbname) {
+	// do we need a comma?
+	$c = (++$curEle < $len) ? ',' : ' ';
+	$update .= $delim.$dbname.'=';
+
+	$attr = $this->findAttribute($name);
+	$get = '$this->get'.$attr['methodSuffix'].'()';
+	switch($attr['type']) {
+	    case 'String':
+		$get = "'\".addslashes($get).\"'$c\"";
+		break;
+	    default:
+		$get = "\".$get.\"$c\"";
+	}
+	$update .= $get;
+    }
+
+    $keys = explode(',', $dbstuff['primary']);
+    $d = $delim."WHERE ";
+    foreach($keys as $key) {
+	$key = trim($key);
+	$attr = $this->findAttribute($key);
+	$update .= $d.$attr['dbname'].'=';
+
+	$get = '$this->get'.$attr['methodSuffix'].'()';
+	switch($attr['type']) {
+	    case 'String':
+		$get = "'\".addslashes($get).\"' \"";
+		break;
+	    default:
+		$get = "\".$get";
+	}
+	$update .= $get;
+
+	$d = $delim."AND ";
+    }
+
+    // Create the insert query
+    $map = $dbstuff['map'];
+    $bean = '';
+    $insert = "\"INSERT INTO ".$dbstuff['table']." SET \"";
+    $delim = "\n                .\"";
+    $len = count($map);
+    if(isset($dbstuff['autoincr'])) {
+	$len--;
+    }
+    $curEle = 0;
+    foreach($map as $name => $dbname) {
+	// do we need a comma?
+	$c = (++$curEle < $len) ? ',' : ' ';
+
+	if($dbstuff['autoincr'] == $name) {
+	    // don't insert auto incremented var
+	} else {
+	    $insert .= $delim.$dbname.'=';
+	    $attr = $this->findAttribute($name);
+
+	    $get = '$this->get'.$attr['methodSuffix'].'()';
+	    switch($attr['type']) {
+		case 'String':
+		    $get = "'\".addslashes($get).\"'$c\"";
+		    break;
+		default:
+		    $get = "\".$get.\"$c\"";
+	    }
+	    $insert .= $get;
+	}
+    }
+
+    // Create primary key check
+    $pkcheck = "\"SELECT * FROM ".$dbstuff['table']." \"";
+    $keys = explode(',', $dbstuff['primary']);
+    $d = $delim."WHERE ";
+    foreach($keys as $key) {
+	$key = trim($key);
+	$attr = $this->findAttribute($key);
+	$pkcheck .= $d.$attr['dbname'].'=';
+
+	$get = '$this->get'.$attr['methodSuffix'].'()';
+	switch($attr['type']) {
+	    case 'String':
+		$get = "'\".addslashes($get).\"' \"";
+		break;
+	    default:
+		$get = "\".$get";
+	}
+	$pkcheck .= $get;
+
+	$d = $delim."AND ";
+    }
+]@
+        // see if row already exists
+        $query = @($pkcheck)@;
+        $rs = $db->sql_query($query);
+        $test = $db->sql_error();
+	if($test['code'] != 0) {
+	    throw new Exception($test['message'], $test['code']);
+	}
+	$nrows = $db->sql_numrows($rs);
+	$db->sql_freeresult($rs);
+	if($nrows > 0) {
+	    // update
+	    $query = @($update)@;
+	} else {
+	    // insert
+	    $query = @($insert)@;
+	}
+        $rs = $db->sql_query($query);
+        $test = $db->sql_error();
+	if($test['code'] != 0) {
+	    throw new Exception($test['message'], $test['code']);
+	}
+	$db->sql_freeresult($rs);
+    }
+@[/*?>*/]@

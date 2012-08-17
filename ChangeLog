@@ -1,0 +1,11 @@
+Version 1.2 (2009-11-12)
+       Small tweaks
+       Fixed nasty endless loop bug in the 'here' document analyzer
+       Extended the property translator so that we can use ${name} and $name style properties
+
+Version 1.1 (2009-09-09)
+       Minor tweaks
+       PHP 5.3 port: replace the "split()" function with "preg_split()"
+
+Version 1.0 (2008-05-01)
+       Initial release

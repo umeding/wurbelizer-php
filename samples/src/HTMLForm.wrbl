@@ -1,0 +1,5 @@
+@[/*<?php*/]@
+@{extends AbstractHTMLForm}@
+<form method="@($this->getMethod())@" action="@($this->getAction())@">
+</form>
+@[/*?>*/]@

@@ -1,0 +1,42 @@
+Installation Instructions
+*************************
+
+This document describes how to install the Wurbelizer.
+
+
+Basic Installation
+==================
+
+1. User install
+
+    Set up an environment variable WURB_HOME and set it to this
+    directory, then add $WURB_HOME/bin to your path.
+
+2. System install
+
+    Find a place on your system, to install the Wurbelizer, 
+    good choices are 
+
+       '/usr/local/share/wurbelizer' or '/usr/share/wurbelizer'
+
+    Define a system wide environment variable WURB_HOME and set it
+    to the install directory. Ensure the $WURB_HOME/bin is included
+    in the users' search path.
+
+
+Fedora / RHEL / CentOS:
+----------------------
+
+Edit 'os/redhat_wurbelizer.sh' and adjust the WURB_HOME path. Then
+copy the shell script to the profile directory (as root)
+
+   # cp os/redhat_wurbelizer.sh /etc/profile.d/wurbelizer.sh
+
+Login as a regular user, you should now be able to use the wurbelizer
+tools.
+
+
+Ubunutu / Debian:
+----------------
+
+

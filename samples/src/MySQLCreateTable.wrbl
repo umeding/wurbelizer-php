@@ -1,0 +1,76 @@
+@[/*<?php*/]@
+@{extends AbstractMySQL}@
+@[
+    $dbstuff = $this->getDBStuff();
+]@
+-- Table definitions for @($dbstuff['table'])@
+DROP TABLE IF EXISTS @($dbstuff['table'])@;
+
+CREATE TABLE @($dbstuff['table'])@ (
+@[
+    $delim = ' ';
+    foreach($this->getAttributeList() as $attr) {
+        if(!$attr['dbname']) 
+	    continue;
+
+        $constraint = $this->findConstraint($attr['name'], 'length');
+	if($constraint) {
+	    $length = '('.$constraint['parameter'][0].')';
+	} else {
+	    $length = '';
+	}
+        switch($attr['type']) {
+	case 'int':
+	    $datatype = 'INTEGER';
+	    break;
+	case 'String':
+	    $datatype = 'VARCHAR';
+	    break;
+	default:
+	    $datatype = strtoupper($attr['type']);
+	    break;
+	}
+	$datatype .= $length;
+
+	$datatype .= " NOT NULL ";
+
+	if($dbstuff['autoincr'] == $attr['dbname']) {
+	    $datatype .= "AUTO_INCREMENT";
+	}
+
+]@
+    @($delim)@@($attr['dbname'])@ @($datatype)@
+@[
+        $delim = ',';
+    }
+
+    // do the primary key (in case one is defined)
+    if(isset($dbstuff['primary'])) {
+	$pkey = $delim."PRIMARY KEY(".$dbstuff['primary'].")";
+]@
+    @($pkey)@
+@[
+    }
+
+    // do the foreign keys (in case they are defined
+    if(isset($dbstuff['foreign'])) {
+	foreach($dbstuff['foreign'] as $fkey) {
+]@
+    @($delim)@FOREIGN @($fkey)@
+@[
+	}
+    }
+]@
+) Engine=InnoDB;
+
+@[
+// process the include files
+if(isset($dbstuff['include'])) {
+    foreach($dbstuff['include'] as $include) {
+]@
+
+@($include)@
+@[
+    }
+}
+]@
