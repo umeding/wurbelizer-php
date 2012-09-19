@@ -1,3 +1,9 @@
+Version 1.3a (2012-09-19)
+       Email address clean up
+
+Version 1.3 (2012-09-06)
+       Small updates in bin
+
 Version 1.2 (2009-11-12)
        Small tweaks
        Fixed nasty endless loop bug in the 'here' document analyzer

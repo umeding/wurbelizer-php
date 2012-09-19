@@ -3,7 +3,7 @@
  * PHP/Wurbelizer - a light-weight code generator for PHP.
  * The code is very much modeled after the original Java version with
  * a few PHP tweaks.
- * Copyright (c) 2007-2008 Uwe B. Meding, meding@yahoo.com
+ * Copyright (c) 2007-2008 Uwe B. Meding, uwe@uwemeding.com
  *
  * Original copyright:
  *
@@ -29,7 +29,7 @@
 /**
  *  Here document (all text between @> and @<)
  *
- *  @author <a href="mailto:meding@yahoo.com">Uwe B. Meding</a>
+ *  @author <a href="mailto:uwe@uwemeding.com">Uwe B. Meding</a>
  */
 class SourceHereDocument {
 
